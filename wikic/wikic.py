@@ -64,6 +64,20 @@ def compile_wiki(root, out):
     return manifest, broken
 
 
+def run_ref(args, client=None):
+    import refs
+
+    client = client or refs.make_client()
+    bucket = refs.bucket_name()
+    if args.ref_cmd == "add":
+        rel = refs.add(client, bucket, args.file, args.doc, args.kind)
+        print(f"{args.doc}/{rel}")
+    else:
+        for rel in refs.list_objects(client, bucket, args.doc):
+            print(rel)
+    return 0
+
+
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(prog="wikic")
     sub = ap.add_subparsers(dest="cmd", required=True)
@@ -71,7 +85,17 @@ def main(argv=None) -> int:
         p = sub.add_parser(name)
         p.add_argument("--root", default=".")
         p.add_argument("--out", default="_stage1")
+    ref = sub.add_parser("ref")
+    rsub = ref.add_subparsers(dest="ref_cmd", required=True)
+    radd = rsub.add_parser("add")
+    radd.add_argument("file")
+    radd.add_argument("--doc", required=True)
+    radd.add_argument("--kind", choices=("pdf", "images", "md"))
+    rlist = rsub.add_parser("list")
+    rlist.add_argument("--doc", required=True)
     args = ap.parse_args(argv)
+    if args.cmd == "ref":
+        return run_ref(args)
     if args.cmd == "compile":
         manifest, broken = compile_wiki(args.root, args.out)
         for path, name in broken:

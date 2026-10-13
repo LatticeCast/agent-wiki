@@ -76,6 +76,18 @@ The `/viewer/` page is a small JS page. It reads the path from the URL hash and 
 
 `wikic.py ref add <file> --doc <doc>` uploads a file into the blob under `<doc>/<kind>/`.
 
+### Blob
+
+`ref add <file> --doc <doc> [--kind pdf|images|md]` uploads to key `<doc>/<kind>/<basename>` (kind is inferred from the extension when omitted), creates the bucket if missing, and updates `<doc>/meta.json` (`{"title", "objects": {"<kind>/<file>": {"sha256", "size"}}}`). Re-adding the same file is idempotent. `ref list --doc <doc>` prints the stored objects. Settings come from `S3_ENDPOINT` (default `http://localhost:9000`), `BLOB_ACCESS_KEY`, `BLOB_SECRET_KEY`, `S3_BUCKET` (default `wiki`).
+
+```
+docker compose up -d blob
+docker compose run --rm py python wikic/wikic.py ref add tests/fixtures/sample.pdf --doc demo
+docker compose run --rm py python wikic/wikic.py ref list --doc demo
+```
+
+Inside compose set `S3_ENDPOINT=http://blob:9000`.
+
 ## Jekyll setup (as in `.tmp/homunmage.github.io`)
 
 - `_layouts` is the `PosetMage/jekyll_layouts` git submodule. Layouts used: `base`, `page/note/basic`, `page/note/directory`.
