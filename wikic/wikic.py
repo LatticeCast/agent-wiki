@@ -23,7 +23,7 @@ def write_manifest(root, out) -> dict:
 
 REPO = Path(__file__).resolve().parent.parent
 JEKYLL_FILES = ("_config.yml", "Gemfile")
-JEKYLL_DIRS = ("_plugins", "_layouts")
+JEKYLL_DIRS = ("_plugins", "_layouts", "assets", "viewer")
 
 
 def copy_jekyll_project(out):
