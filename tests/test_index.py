@@ -22,15 +22,15 @@ class IndexTest(unittest.TestCase):
         self.assertEqual(self.index["alpha"], ["Alpha/index.md"])
 
     def test_same_folder_wins(self):
-        self.assertEqual(self.r("beta", "Alpha/index.md"), "/Alpha/beta/")
-        self.assertEqual(self.r("beta", "Docs/code.md"), "/Docs/beta/")
+        self.assertEqual(self.r("beta", "Alpha/index.md"), "/Alpha/beta.html")
+        self.assertEqual(self.r("beta", "Docs/code.md"), "/Docs/beta.html")
 
     def test_tie_is_lexicographic(self):
-        self.assertEqual(self.r("beta", "index.md"), "/Alpha/beta/")
+        self.assertEqual(self.r("beta", "index.md"), "/Alpha/beta.html")
 
     def test_path_like_and_case(self):
-        self.assertEqual(self.r("Docs/beta", "index.md"), "/Docs/beta/")
-        self.assertEqual(self.r("docs/BETA.md", "Alpha/index.md"), "/Docs/beta/")
+        self.assertEqual(self.r("Docs/beta", "index.md"), "/Docs/beta.html")
+        self.assertEqual(self.r("docs/BETA.md", "Alpha/index.md"), "/Docs/beta.html")
 
     def test_unknown_is_none(self):
         self.assertIsNone(self.r("nope", "index.md"))

@@ -13,10 +13,10 @@ CLI = ROOT / "wikic" / "wikic.py"
 EXPECTED = {
     "index.md": ("index", "/"),
     "Alpha/index.md": ("alpha", "/Alpha/"),
-    "Alpha/beta.md": ("beta", "/Alpha/beta/"),
-    "Docs/beta.md": ("beta", "/Docs/beta/"),
-    "Docs/code.md": ("code", "/Docs/code/"),
-    "Docs/ref.md": ("ref", "/Docs/ref/"),
+    "Alpha/beta.md": ("beta", "/Alpha/beta.html"),
+    "Docs/beta.md": ("beta", "/Docs/beta.html"),
+    "Docs/code.md": ("code", "/Docs/code.html"),
+    "Docs/ref.md": ("ref", "/Docs/ref.html"),
 }
 
 

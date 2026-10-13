@@ -1,6 +1,7 @@
 """wikic: Stage 1 compiler for the agent-wiki."""
 import argparse
 import json
+import re
 import shutil
 import sys
 from pathlib import Path
@@ -22,14 +23,15 @@ def write_manifest(root, out) -> dict:
 
 
 REPO = Path(__file__).resolve().parent.parent
-JEKYLL_FILES = ("_config.yml", "Gemfile")
-JEKYLL_DIRS = ("_plugins", "_layouts", "assets", "viewer")
+JEKYLL_FILES = ("_config.yml", "Gemfile", "Gemfile.lock")
+JEKYLL_DIRS = ("_layouts", "assets", "viewer")
 
 
 def copy_jekyll_project(out):
     """Copy the Jekyll project files next to the pages (no .git pointers)."""
     for name in JEKYLL_FILES:
-        shutil.copy2(REPO / name, out / name)
+        if (REPO / name).is_file():
+            shutil.copy2(REPO / name, out / name)
     for name in JEKYLL_DIRS:
         dest = out / name
         if dest.exists():
@@ -39,15 +41,26 @@ def copy_jekyll_project(out):
         )
 
 
-def blob_base():
-    """BLOB_BASE env, else `blob_base` in _config.yml, else the local default."""
-    import os
-    import re
+def page_title(path):
+    """The title of a page is its file name without `.md`."""
+    return Path(path).stem
 
-    if os.environ.get("BLOB_BASE"):
-        return os.environ["BLOB_BASE"]
-    m = re.search(r"^blob_base:\s*(\S+)", (REPO / "_config.yml").read_text(), re.M)
-    return m.group(1).strip("\"'") if m else DEFAULT_BLOB_BASE
+
+def with_front_matter(text, title):
+    """Jekyll only renders files with front matter; add `title:` when missing."""
+    line = f"title: {json.dumps(title, ensure_ascii=False)}\n" if title else ""
+    if text.startswith("---\n"):
+        end = text.find("\n---", 4)
+        if end != -1:
+            if not line or re.search(r"^title:", text[4:end], re.M):
+                return text
+            return "---\n" + line + text[4:]
+    return "---\n" + line + "---\n" + text
+
+
+def blob_base():
+    """Blob links always point at /blob/ on the site domain."""
+    return DEFAULT_BLOB_BASE
 
 
 def compile_wiki(root, out):
@@ -67,7 +80,7 @@ def compile_wiki(root, out):
         broken += [(path, name) for name in bad]
         dest = out / path
         dest.parent.mkdir(parents=True, exist_ok=True)
-        dest.write_text(text, encoding="utf-8")
+        dest.write_text(with_front_matter(text, page_title(path)), encoding="utf-8")
     copy_jekyll_project(out)
     report = {"broken": [{"page": p, "target": t} for p, t in sorted(broken)]}
     (out / "report.json").write_text(
@@ -76,19 +89,14 @@ def compile_wiki(root, out):
     return manifest, broken
 
 
-def run_ref(args, client=None):
+def run_ref(args):
     import refs
 
-    client = client or refs.make_client()
-    bucket = refs.bucket_name()
-    if args.ref_cmd == "init":
-        refs.init(client, bucket)
-        print(f"initialised bucket {bucket}")
-    elif args.ref_cmd == "add":
-        rel = refs.add(client, bucket, args.file, args.doc, args.kind)
-        print(f"{args.doc}/{rel}")
+    blob = Path(args.blob_dir)
+    if args.ref_cmd == "add":
+        print(f"{args.doc}/{refs.add(blob, args.file, args.doc, args.kind)}")
     else:
-        for rel in refs.list_objects(client, bucket, args.doc):
+        for rel in refs.list_objects(blob, args.doc):
             print(rel)
     return 0
 
@@ -98,17 +106,18 @@ def main(argv=None) -> int:
     sub = ap.add_subparsers(dest="cmd", required=True)
     for name in ("scan", "compile"):
         p = sub.add_parser(name)
-        p.add_argument("--root", default=".")
+        p.add_argument("--root", default="pages")
         p.add_argument("--out", default="_stage1")
     ref = sub.add_parser("ref")
     rsub = ref.add_subparsers(dest="ref_cmd", required=True)
-    rsub.add_parser("init")
     radd = rsub.add_parser("add")
     radd.add_argument("file")
     radd.add_argument("--doc", required=True)
     radd.add_argument("--kind", choices=("pdf", "images", "md"))
+    radd.add_argument("--blob-dir", default="blob")
     rlist = rsub.add_parser("list")
     rlist.add_argument("--doc", required=True)
+    rlist.add_argument("--blob-dir", default="blob")
     args = ap.parse_args(argv)
     if args.cmd == "ref":
         return run_ref(args)

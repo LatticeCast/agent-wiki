@@ -12,7 +12,7 @@ from links import compile_text, slugify  # noqa: E402
 
 
 def res(target, from_path):
-    return {"beta": "/Alpha/beta/"}.get(target)
+    return {"beta": "/Alpha/beta.html"}.get(target)
 
 
 class LinksTest(unittest.TestCase):
@@ -22,7 +22,7 @@ class LinksTest(unittest.TestCase):
     def test_forms(self):
         out, broken = self.c("[[beta]] [[beta|Beta page]] [[beta#Some Heading]]")
         self.assertEqual(
-            out, "[beta](/Alpha/beta/) [Beta page](/Alpha/beta/) [beta](/Alpha/beta/#some-heading)"
+            out, "[beta](/Alpha/beta.html) [Beta page](/Alpha/beta.html) [beta](/Alpha/beta.html#some-heading)"
         )
         self.assertEqual(broken, [])
 
@@ -51,9 +51,9 @@ class LinksTest(unittest.TestCase):
                 check=True, capture_output=True,
             )
             text = (Path(o) / "Alpha" / "index.md").read_text()
-            self.assertIn("[beta](/Alpha/beta/)", text)
-            self.assertIn("[Beta page](/Alpha/beta/)", text)
-            self.assertIn("[beta](/Alpha/beta/#some-heading)", text)
+            self.assertIn("[beta](/Alpha/beta.html)", text)
+            self.assertIn("[Beta page](/Alpha/beta.html)", text)
+            self.assertIn("[beta](/Alpha/beta.html#some-heading)", text)
             self.assertTrue((Path(o) / "manifest.json").exists())
 
     def test_cli_code_and_report(self):

@@ -1,44 +1,43 @@
-services:
-  blob:
-    image: rustfs/rustfs:latest
-    user: "0:0"
-    ports:
-      - "9000:9000"
-      - "9001:9001"
-    volumes:
-      - blob_data:/data/blob0
-    environment:
-      RUSTFS_VOLUMES: /data/blob0
-      RUSTFS_ADDRESS: 0.0.0.0:9000
-      RUSTFS_CONSOLE_ADDRESS: 0.0.0.0:9001
-      RUSTFS_ACCESS_KEY: ${BLOB_ACCESS_KEY}
-      RUSTFS_SECRET_KEY: ${BLOB_SECRET_KEY}
-    healthcheck:
-      test: ["CMD", "curl", "-fsS", "http://127.0.0.1:9000/health"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
+name: agent-wiki
 
+# Generated output never touches the host: _stage1/ and _site/ are Docker
+# volumes shared by the py and jekyll containers. Only the repo's source
+# folders are mounted (read-only); ./blob (git-ignored) is mounted at /blob.
+services:
   py:
     build:
       context: .
       dockerfile: wikic/Dockerfile
     working_dir: /app
-    command: uv run --no-sync python wikic/wikic.py compile
     environment:
-      S3_ENDPOINT: http://blob:9000
-      BLOB_ACCESS_KEY: ${BLOB_ACCESS_KEY:-}
-      BLOB_SECRET_KEY: ${BLOB_SECRET_KEY:-}
+      PYTHONDONTWRITEBYTECODE: "1"
+    command: uv run --no-sync python wikic/wikic.py compile
     volumes:
-      - .:/app
+      - ./wikic:/app/wikic:ro
+      - ./tests:/app/tests:ro
+      - ./pages:/app/pages:ro
+      - ./assets:/app/assets:ro
+      - ./viewer:/app/viewer:ro
+      - ./_layouts:/app/_layouts:ro
+      - ./_config.yml:/app/_config.yml:ro
+      - ./Gemfile:/app/Gemfile:ro
+      - ./Gemfile.lock:/app/Gemfile.lock:ro
+      - stage1:/app/_stage1
+      - site:/app/_site
 
   jekyll:
     image: jekyll/jekyll:latest
-    command: sh -c "bundle install && bundle exec jekyll build --source _stage1 --destination _site"
+    working_dir: /srv/jekyll/_stage1
+    ports:
+      - "4000:4000"
+    command: sh -c "bundle install && bundle exec jekyll build --source . --destination ../_site"
     volumes:
-      - .:/srv/jekyll
+      - stage1:/srv/jekyll/_stage1
+      - site:/srv/jekyll/_site
+      - ./blob:/srv/jekyll/_site/blob
       - bundle_cache:/usr/local/bundle
 
 volumes:
-  blob_data:
+  stage1:
+  site:
   bundle_cache:

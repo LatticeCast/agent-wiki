@@ -14,10 +14,10 @@ from scan import scan  # noqa: E402
 EXPECTED = {
     "index.md": ("index", "/"),
     "Alpha/index.md": ("alpha", "/Alpha/"),
-    "Alpha/beta.md": ("beta", "/Alpha/beta/"),
-    "Docs/beta.md": ("beta", "/Docs/beta/"),
-    "Docs/code.md": ("code", "/Docs/code/"),
-    "Docs/ref.md": ("ref", "/Docs/ref/"),
+    "Alpha/beta.md": ("beta", "/Alpha/beta.html"),
+    "Docs/beta.md": ("beta", "/Docs/beta.html"),
+    "Docs/code.md": ("code", "/Docs/code.html"),
+    "Docs/ref.md": ("ref", "/Docs/ref.html"),
 }
 
 
@@ -51,3 +51,17 @@ class ScanTest(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class SpaceInNameTest(unittest.TestCase):
+    def test_url_is_percent_encoded_and_title_is_file_name(self):
+        import tempfile
+        import wikic as w
+
+        with tempfile.TemporaryDirectory() as d:
+            (Path(d) / "Notes").mkdir()
+            (Path(d) / "Notes" / "Reading list.md").write_text("x")
+            page = scan(d)["pages"]["Notes/Reading list.md"]
+        self.assertEqual(page["url"], "/Notes/Reading%20list.html")
+        self.assertEqual(w.page_title("Notes/Reading list.md"), "Reading list")
+        self.assertEqual(w.page_title("Alpha/index.md"), "index")

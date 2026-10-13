@@ -7,7 +7,7 @@ WIKILINK = re.compile(r"\[\[([^\[\]\|#\n]+)(?:#([^\[\]\|\n]*))?(?:\|([^\[\]\n]*)
 # `![[doc/images/file]]` embeds and `[[ref:doc/kind/file#p=N]]` viewer links.
 BLOBREF = re.compile(r"(!)?\[\[(ref:)?([^\[\]\|#\n]+)(?:#([^\[\]\|\n]*))?(?:\|([^\[\]\n]*))?\]\]")
 KINDS = ("pdf", "images", "md")
-DEFAULT_BLOB_BASE = "http://localhost:9000/wiki"
+DEFAULT_BLOB_BASE = "/blob"
 
 
 def slugify(heading: str) -> str:

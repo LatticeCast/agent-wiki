@@ -1,7 +1,10 @@
+---
+title: "index"
+---
 # Alpha
 
-[beta](/Alpha/beta/)
+[beta](/Alpha/beta.html)
 
-[Beta page](/Alpha/beta/)
+[Beta page](/Alpha/beta.html)
 
-[beta](/Alpha/beta/#some-heading)
+[beta](/Alpha/beta.html#some-heading)

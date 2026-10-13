@@ -1,7 +1,6 @@
 ---
-layout: page/note/basic
+layout: default
 title: Viewer
-permalink: /viewer/
 ---
 
 <div id="viewer" data-blob-base="{{ site.blob_base }}">Loading…</div>

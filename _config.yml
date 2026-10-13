@@ -1,14 +1,18 @@
 title: agent-wiki
 url: ""
 baseurl: ""
-blob_base: http://localhost:9000/wiki
+blob_base: /blob
+
+# _site/blob is a mount of the git-ignored ./blob folder: never clean it.
+keep_files:
+  - blob
 
 defaults:
   -
     scope:
       path: ""
     values:
-      layout: "page/note/basic"
+      layout: "default"
 
 kramdown:
   parse_block_html: true

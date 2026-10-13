@@ -1,0 +1,19 @@
+:root { color-scheme: light dark; --fg: #1f2328; --bg: #ffffff; --muted: #59636e; --link: #0b5fff; --line: #d1d9e0; --code: #f3f4f6; }
+@media (prefers-color-scheme: dark) { :root { --fg: #e6edf3; --bg: #0d1117; --muted: #9198a1; --link: #6ea8ff; --line: #30363d; --code: #161b22; } }
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--fg); font: 16px/1.65 system-ui, -apple-system, "Segoe UI", "Noto Sans", "Noto Sans CJK TC", sans-serif; }
+.site-header { border-bottom: 1px solid var(--line); padding: 0.8rem 1rem; }
+.site-title { font-weight: 600; color: var(--fg); text-decoration: none; }
+.page-content { max-width: 52rem; margin: 0 auto; padding: 1.5rem 1rem 4rem; }
+a { color: var(--link); }
+h1, h2, h3, h4 { line-height: 1.25; margin: 1.6em 0 0.5em; }
+.page-title { margin-top: 0; }
+img, video, canvas { max-width: 100%; height: auto; }
+pre, code { background: var(--code); border-radius: 6px; font: 0.9em ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+code { padding: 0.15em 0.35em; }
+pre { padding: 0.9rem 1rem; overflow-x: auto; }
+pre code { padding: 0; background: none; }
+table { border-collapse: collapse; display: block; overflow-x: auto; }
+th, td { border: 1px solid var(--line); padding: 0.4rem 0.7rem; }
+blockquote { margin: 1em 0; padding: 0 1rem; border-left: 4px solid var(--line); color: var(--muted); }
+.wikilink-broken { color: #b42318; border-bottom: 1px dashed currentColor; }

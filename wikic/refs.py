@@ -1,7 +1,11 @@
-"""Blob references: upload external documents to RustFS (S3) and track them."""
+"""Blob references: external documents kept in the git-ignored `blob/` folder.
+
+Layout: blob/<doc>/<kind>/<file>, kind = pdf | images | md. The built site
+serves the folder at /blob/*, so a file is reachable at /blob/<doc>/<kind>/<file>.
+"""
 import hashlib
 import json
-import os
+import shutil
 from pathlib import Path
 
 IMAGE_EXTS = {".png", ".jpg", ".jpeg", ".gif", ".webp", ".svg", ".avif", ".bmp"}
@@ -18,94 +22,29 @@ def infer_kind(name):
     raise ValueError(f"cannot infer kind for {name!r}; pass --kind pdf|images|md")
 
 
-def make_client():
-    import boto3
-
-    return boto3.client(
-        "s3",
-        endpoint_url=os.environ.get("S3_ENDPOINT", "http://localhost:9000"),
-        aws_access_key_id=os.environ.get("BLOB_ACCESS_KEY"),
-        aws_secret_access_key=os.environ.get("BLOB_SECRET_KEY"),
-        region_name="us-east-1",
-    )
-
-
-def bucket_name():
-    return os.environ.get("S3_BUCKET", "wiki")
-
-
-def _is_missing(err):
-    code = str(getattr(err, "response", {}).get("Error", {}).get("Code", ""))
-    return code in ("NoSuchKey", "404", "NoSuchBucket", "NotFound")
-
-
-def ensure_bucket(client, bucket):
-    try:
-        client.head_bucket(Bucket=bucket)
-    except Exception as err:  # botocore ClientError
-        if not _is_missing(err):
-            raise
-        client.create_bucket(Bucket=bucket)
-
-
-def init(client, bucket):
-    """Create the bucket if missing; allow anonymous read and CORS GET for `*`."""
-    ensure_bucket(client, bucket)
-    policy = {
-        "Version": "2012-10-17",
-        "Statement": [
-            {
-                "Effect": "Allow",
-                "Principal": {"AWS": ["*"]},
-                "Action": ["s3:GetObject"],
-                "Resource": [f"arn:aws:s3:::{bucket}/*"],
-            }
-        ],
-    }
-    client.put_bucket_policy(Bucket=bucket, Policy=json.dumps(policy))
-    client.put_bucket_cors(
-        Bucket=bucket,
-        CORSConfiguration={
-            "CORSRules": [
-                {
-                    "AllowedOrigins": ["*"],
-                    "AllowedMethods": ["GET", "HEAD"],
-                    "AllowedHeaders": ["*"],
-                    "ExposeHeaders": ["ETag", "Content-Length", "Content-Type"],
-                }
-            ]
-        },
-    )
-
-
-def read_meta(client, bucket, doc):
-    try:
-        body = client.get_object(Bucket=bucket, Key=f"{doc}/meta.json")["Body"].read()
-    except Exception as err:
-        if not _is_missing(err):
-            raise
+def read_meta(blob, doc):
+    meta = Path(blob) / doc / "meta.json"
+    if not meta.is_file():
         return {"title": doc, "objects": {}}
-    return json.loads(body.decode("utf-8"))
+    return json.loads(meta.read_text(encoding="utf-8"))
 
 
-def add(client, bucket, file, doc, kind=None):
-    """Upload `file` to `<doc>/<kind>/<basename>` and update `<doc>/meta.json`."""
-    path = Path(file)
-    kind = kind or infer_kind(path.name)
-    data = path.read_bytes()
-    ensure_bucket(client, bucket)
-    rel = f"{kind}/{path.name}"
-    client.put_object(Bucket=bucket, Key=f"{doc}/{rel}", Body=data)
-    meta = read_meta(client, bucket, doc)
+def add(blob, file, doc, kind=None):
+    """Copy `file` to `blob/<doc>/<kind>/<basename>` and update `<doc>/meta.json`."""
+    src = Path(file)
+    kind = kind or infer_kind(src.name)
+    rel = f"{kind}/{src.name}"
+    dest = Path(blob) / doc / rel
+    dest.parent.mkdir(parents=True, exist_ok=True)
+    shutil.copyfile(src, dest)
+    data = dest.read_bytes()
+    meta = read_meta(blob, doc)
     meta["objects"][rel] = {"sha256": hashlib.sha256(data).hexdigest(), "size": len(data)}
-    client.put_object(
-        Bucket=bucket,
-        Key=f"{doc}/meta.json",
-        Body=(json.dumps(meta, sort_keys=True, indent=2) + "\n").encode("utf-8"),
-        ContentType="application/json",
+    (Path(blob) / doc / "meta.json").write_text(
+        json.dumps(meta, sort_keys=True, indent=2) + "\n", encoding="utf-8"
     )
     return rel
 
 
-def list_objects(client, bucket, doc):
-    return sorted(read_meta(client, bucket, doc)["objects"])
+def list_objects(blob, doc):
+    return sorted(read_meta(blob, doc)["objects"])

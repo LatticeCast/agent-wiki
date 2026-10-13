@@ -35,8 +35,8 @@ class ViewerPureFunctions(unittest.TestCase):
 
     def test_build_url(self):
         self.assertEqual(
-            self.run_js('v.buildUrl("http://h:9000/wiki/", "d/images/a b.png")'),
-            "http://h:9000/wiki/d/images/a%20b.png",
+            self.run_js('v.buildUrl("/blob/", "d/images/a b.png")'),
+            "/blob/d/images/a%20b.png",
         )
 
 

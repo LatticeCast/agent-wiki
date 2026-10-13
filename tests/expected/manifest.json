@@ -3,7 +3,7 @@
     "Alpha/beta.md": {
       "hash": "sha256:08dd8a515341b0f0eacd44afa3bf28bc655f358506cb171bee6359d0a338dfe4",
       "name": "beta",
-      "url": "/Alpha/beta/"
+      "url": "/Alpha/beta.html"
     },
     "Alpha/index.md": {
       "hash": "sha256:a1c5ff995aa98151edf789ac8a58c84d3ed84e09425453244b34837fd48e5abe",
@@ -13,17 +13,17 @@
     "Docs/beta.md": {
       "hash": "sha256:16fa37dde4ddd01c11b9618f3272ef715a13e613e093d2c02a7d35efdecfba3e",
       "name": "beta",
-      "url": "/Docs/beta/"
+      "url": "/Docs/beta.html"
     },
     "Docs/code.md": {
       "hash": "sha256:d374cf1f45d0328240f7b3f2777fe19b5f87c46ad6c0e64797f3615b476806e8",
       "name": "code",
-      "url": "/Docs/code/"
+      "url": "/Docs/code.html"
     },
     "Docs/ref.md": {
       "hash": "sha256:3be78f6af0ffc033d1f8645105759918713ee6f6e5b09215b25cfe5217623b78",
       "name": "ref",
-      "url": "/Docs/ref/"
+      "url": "/Docs/ref.html"
     },
     "index.md": {
       "hash": "sha256:7d48eefbcff2495cc4b0cd99ea783bbc46184d78af064c56e1a7dc7ae9dba3aa",

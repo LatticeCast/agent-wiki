@@ -36,8 +36,8 @@ class CompileCliTest(unittest.TestCase):
             got = {
                 k: v
                 for k, v in got.items()
-                if k not in ("_config.yml", "Gemfile")
-                and not k.startswith(("_plugins/", "_layouts/", "assets/", "viewer/"))
+                if k not in ("_config.yml", "Gemfile", "Gemfile.lock")
+                and not k.startswith(("_layouts/", "assets/", "viewer/"))
             }
             self.assertEqual(set(got), set(want))
             for path in want:
@@ -81,8 +81,7 @@ class CompileCliTest(unittest.TestCase):
             for rel in (
                 "_config.yml",
                 "Gemfile",
-                "_plugins/raw_markdown.rb",
-                "_layouts/base.html",
+                "_layouts/default.html",
             ):
                 self.assertTrue((out / rel).is_file(), rel)
             self.assertFalse(list(out.rglob(".git")))

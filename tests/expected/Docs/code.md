@@ -1,3 +1,6 @@
+---
+title: "code"
+---
 # Code
 
 `[[code]]`

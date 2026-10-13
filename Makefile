@@ -1,28 +1,30 @@
-ROOT ?= .
-OUT ?= _stage1
-HOST_UID := $(shell id -u)
-HOST_GID := $(shell id -g)
+ROOT ?= pages
 
-.PHONY: site stage1 stage2 test-site clean
+.PHONY: site stage1 stage2 serve test test-site clean
 
+# Wiki pages are in pages/. _stage1/ and _site/ live in Docker volumes (never on
+# the host); ./blob (git-ignored) is mounted at _site/blob/ by the jekyll service.
 site: stage1 stage2
 
 stage1:
-	docker compose run --rm --user $(HOST_UID):$(HOST_GID) -e HOME=/tmp -e UV_CACHE_DIR=/tmp/uv py uv run --no-sync python wikic/wikic.py compile --root $(ROOT) --out $(OUT)
+	docker compose run --rm py sh -c "find _stage1 -mindepth 1 -delete; uv run --no-sync python wikic/wikic.py compile --root $(ROOT) --out _stage1"
 
 stage2:
-	docker compose run --rm -e HOST_UID=$(HOST_UID) -e HOST_GID=$(HOST_GID) jekyll sh -c "bundle install && bundle exec jekyll build --source $(OUT) --destination _site; rc=\$$?; chown -R \$$HOST_UID:\$$HOST_GID _site $(OUT); exit \$$rc"
+	mkdir -p blob
+	docker compose run --rm jekyll
 
+serve:
+	mkdir -p blob
+	docker compose run --rm --service-ports jekyll sh -c "bundle install && bundle exec jekyll serve --source . --destination ../_site --host 0.0.0.0 --port 4000 --skip-initial-build --no-watch"
 
-clean:
-	rm -rf _stage1 _site
+test:
+	python3 -m unittest discover -s tests
 
 test-site:
-	$(MAKE) site ROOT=tests/fixtures/wiki OUT=_stage1
-	python3 tests/check_site.py _site
+	$(MAKE) site ROOT=tests/fixtures/wiki
+	docker compose run --rm py uv run --no-sync python tests/check_site.py _site
 
-.PHONY: test-blob
-
-test-blob:
-	docker compose up -d --wait blob
-	docker compose run --rm --user $(HOST_UID):$(HOST_GID) -e HOME=/tmp -e UV_CACHE_DIR=/tmp/uv -e BLOB_E2E=1 -e BLOB_BASE=http://blob:9000/wiki py uv run --no-sync python -m unittest tests.test_blob_http -v; rc=$$?; docker compose stop blob; exit $$rc
+clean:
+	docker compose down --remove-orphans
+	docker volume rm -f agent-wiki_stage1 agent-wiki_site
+	rmdir _site _stage1 2>/dev/null || true
