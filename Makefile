@@ -11,11 +11,11 @@ stage1:
 
 stage2:
 	mkdir -p blob
-	docker compose run --rm jekyll
+	docker compose run --rm --no-deps jekyll sh -c "bundle install && bundle exec jekyll build --source . --destination ../_site"
 
-serve:
+serve: stage1
 	mkdir -p blob
-	docker compose run --rm --service-ports jekyll sh -c "bundle install && bundle exec jekyll serve --source . --destination ../_site --host 0.0.0.0 --port 4000 --skip-initial-build --no-watch"
+	docker compose up
 
 test:
 	python3 -m unittest discover -s tests

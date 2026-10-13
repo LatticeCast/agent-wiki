@@ -64,16 +64,18 @@ Jekyll builds `_stage1/` into `_site/` with the `jekyll/jekyll` image. Gems are 
 
 ## Docker
 
-`docker-compose.yml` has two services:
+`docker-compose.yml` has two services. `docker compose up` starts only `jekyll`.
 
-- `py`: built from `wikic/Dockerfile` on the `ghcr.io/astral-sh/uv` image. It mounts the repo source folders read-only and runs Stage 1.
-- `jekyll`: `jekyll/jekyll:latest`. It mounts the `stage1` and `site` volumes, `./blob` at `_site/blob`, and the `bundle_cache` volume. It runs Stage 2 and serves the site on port `4000`.
+- `jekyll`: `jekyll/jekyll:latest`. It mounts the `stage1` and `site` volumes, `./blob` at `_site/blob`, and the `bundle_cache` volume. It builds `_stage1` into `_site` and serves it on port `4000`.
+- `py` (profile `tools`, so `up` does not start it): built from `wikic/Dockerfile` on the `ghcr.io/astral-sh/uv` image. It mounts the repo source folders read-only and runs Stage 1. Run it with `make stage1`.
 
 ## Run
 
 ```
-make site         # stage 1 + stage 2
-make serve        # serve the built site at http://localhost:4000 (from the jekyll container)
+make stage1       # compile pages/ into the _stage1 volume (py container)
+docker compose up # build _stage1 and serve it at http://localhost:4000 (jekyll container only)
+make serve        # make stage1, then docker compose up
+make site         # stage 1 + a one-off Jekyll build into the _site volume
 make test         # unit tests (python3 -m unittest discover -s tests)
 make test-site    # build tests/fixtures/wiki and check every internal link
 make clean        # remove the containers and the stage1/site volumes

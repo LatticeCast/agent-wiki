@@ -5,13 +5,14 @@ name: agent-wiki
 # folders are mounted (read-only); ./blob (git-ignored) is mounted at /blob.
 services:
   py:
+    profiles: ["tools"]
     build:
       context: .
       dockerfile: wikic/Dockerfile
     working_dir: /app
     environment:
       PYTHONDONTWRITEBYTECODE: "1"
-    command: uv run --no-sync python wikic/wikic.py compile
+    command: sh -c "find _stage1 -mindepth 1 -delete; uv run --no-sync python wikic/wikic.py compile --root pages --out _stage1"
     volumes:
       - ./wikic:/app/wikic:ro
       - ./tests:/app/tests:ro
@@ -30,7 +31,12 @@ services:
     working_dir: /srv/jekyll/_stage1
     ports:
       - "4000:4000"
-    command: sh -c "bundle install && bundle exec jekyll build --source . --destination ../_site"
+    command:
+      - sh
+      - -c
+      - |
+        [ -f Gemfile ] || { echo "_stage1 is empty, run make stage1 first"; exit 1; }
+        bundle install && bundle exec jekyll serve --source . --destination ../_site --host 0.0.0.0 --port 4000 --no-watch
     volumes:
       - stage1:/srv/jekyll/_stage1
       - site:/srv/jekyll/_site
