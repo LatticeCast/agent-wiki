@@ -1,6 +1,7 @@
 services:
   blob:
     image: rustfs/rustfs:latest
+    user: "0:0"
     ports:
       - "9000:9000"
       - "9001:9001"
@@ -24,6 +25,10 @@ services:
       dockerfile: wikic/Dockerfile
     working_dir: /app
     command: uv run --no-sync python wikic/wikic.py compile
+    environment:
+      S3_ENDPOINT: http://blob:9000
+      BLOB_ACCESS_KEY: ${BLOB_ACCESS_KEY:-}
+      BLOB_SECRET_KEY: ${BLOB_SECRET_KEY:-}
     volumes:
       - .:/app
 
@@ -32,6 +37,8 @@ services:
     command: sh -c "bundle install && bundle exec jekyll build --source _stage1 --destination _site"
     volumes:
       - .:/srv/jekyll
+      - bundle_cache:/usr/local/bundle
 
 volumes:
   blob_data:
+  bundle_cache:
