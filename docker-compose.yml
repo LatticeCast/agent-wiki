@@ -1,0 +1,37 @@
+services:
+  blob:
+    image: rustfs/rustfs:latest
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - blob_data:/data/blob0
+    environment:
+      RUSTFS_VOLUMES: /data/blob0
+      RUSTFS_ADDRESS: 0.0.0.0:9000
+      RUSTFS_CONSOLE_ADDRESS: 0.0.0.0:9001
+      RUSTFS_ACCESS_KEY: ${BLOB_ACCESS_KEY}
+      RUSTFS_SECRET_KEY: ${BLOB_SECRET_KEY}
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://127.0.0.1:9000/health"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  py:
+    build:
+      context: .
+      dockerfile: wikic/Dockerfile
+    working_dir: /app
+    command: uv run --no-sync python wikic/wikic.py compile
+    volumes:
+      - .:/app
+
+  jekyll:
+    image: jekyll/jekyll:latest
+    command: sh -c "bundle install && bundle exec jekyll build --source _stage1 --destination _site"
+    volumes:
+      - .:/srv/jekyll
+
+volumes:
+  blob_data:

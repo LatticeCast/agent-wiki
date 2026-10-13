@@ -1,0 +1,8 @@
+.tmp/
+_site/
+_stage1/
+.jekyll-cache/
+.sass-cache/
+__pycache__/
+*.pyc
+.env
