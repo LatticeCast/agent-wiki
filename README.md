@@ -110,6 +110,21 @@ Inside compose set `S3_ENDPOINT=http://blob:9000`.
 - `py`: built from `wikic/Dockerfile` on the `ghcr.io/astral-sh/uv` image; dependencies are in `pyproject.toml` and installed with `uv sync`. It runs Stage 1 (`wikic/wikic.py`) on the project directory.
 - `jekyll`: `jekyll/jekyll:latest`, Stage 2: builds `_stage1/` into `_site/`.
 
+## Run
+
+Set `BLOB_ACCESS_KEY` and `BLOB_SECRET_KEY` in `.env` (read by `docker-compose.yml`).
+
+```
+git submodule update --init      # _layouts
+make site                        # stage 1 (py container) + stage 2 (jekyll container) -> _site/
+make test-site                   # build tests/fixtures/wiki and check every internal link
+make test-blob                   # start blob, upload, anonymous GET with CORS
+python3 -m unittest discover -s tests
+make clean
+```
+
+The `blob` service runs as root (`user: "0:0"`), because the RustFS default user cannot write a fresh volume. The `jekyll` service keeps its gems in the `bundle_cache` volume, so only the first `make site` installs them. `py` and `jekyll` write `_stage1/` and `_site/` as your user.
+
 ## Project management
 
 Tickets are tracked in the `agent-wiki` table (from the `pm` template): `https://table.novasplit.ai/homun%40novasplit-ai/agent-wiki`. They are worked by the agentic-hive (`.agent-skills/agent/agentic-hive`). Connection settings are in `.tmp/agentic-hive/.env`.
