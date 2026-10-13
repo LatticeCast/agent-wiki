@@ -33,6 +33,12 @@ class CompileCliTest(unittest.TestCase):
             res = run_compile(out)
             self.assertEqual(res.returncode, 0, res.stderr)
             got, want = tree_hashes(out), tree_hashes(EXPECTED)
+            got = {
+                k: v
+                for k, v in got.items()
+                if k not in ("_config.yml", "Gemfile")
+                and not k.startswith(("_plugins/", "_layouts/"))
+            }
             self.assertEqual(set(got), set(want))
             for path in want:
                 self.assertEqual(got[path], want[path], path)
@@ -67,6 +73,19 @@ class CompileCliTest(unittest.TestCase):
             run_compile(out)
             for page in out.rglob("*.md"):
                 self.assertNotIn("[[", strip_code(page.read_text("utf-8")), page)
+
+    def test_output_contains_jekyll_project(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            out = Path(tmp) / "o"
+            self.assertEqual(run_compile(out).returncode, 0)
+            for rel in (
+                "_config.yml",
+                "Gemfile",
+                "_plugins/raw_markdown.rb",
+                "_layouts/base.html",
+            ):
+                self.assertTrue((out / rel).is_file(), rel)
+            self.assertFalse(list(out.rglob(".git")))
 
 
 if __name__ == "__main__":

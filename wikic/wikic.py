@@ -1,6 +1,7 @@
 """wikic: Stage 1 compiler for the agent-wiki."""
 import argparse
 import json
+import shutil
 import sys
 from pathlib import Path
 
@@ -20,6 +21,24 @@ def write_manifest(root, out) -> dict:
     return manifest
 
 
+REPO = Path(__file__).resolve().parent.parent
+JEKYLL_FILES = ("_config.yml", "Gemfile")
+JEKYLL_DIRS = ("_plugins", "_layouts")
+
+
+def copy_jekyll_project(out):
+    """Copy the Jekyll project files next to the pages (no .git pointers)."""
+    for name in JEKYLL_FILES:
+        shutil.copy2(REPO / name, out / name)
+    for name in JEKYLL_DIRS:
+        dest = out / name
+        if dest.exists():
+            shutil.rmtree(dest)
+        shutil.copytree(
+            REPO / name, dest, ignore=shutil.ignore_patterns(".git")
+        )
+
+
 def compile_wiki(root, out):
     """Write the compiled wiki to `out`; return (manifest, broken)."""
     root, out = Path(root), Path(out)
@@ -37,6 +56,7 @@ def compile_wiki(root, out):
         dest = out / path
         dest.parent.mkdir(parents=True, exist_ok=True)
         dest.write_text(text, encoding="utf-8")
+    copy_jekyll_project(out)
     report = {"broken": [{"page": p, "target": t} for p, t in sorted(broken)]}
     (out / "report.json").write_text(
         json.dumps(report, sort_keys=True, indent=2) + "\n", encoding="utf-8"

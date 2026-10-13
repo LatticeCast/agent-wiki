@@ -1,0 +1,26 @@
+title: agent-wiki
+url: ""
+baseurl: ""
+
+defaults:
+  -
+    scope:
+      path: ""
+    values:
+      layout: "page/note/basic"
+
+kramdown:
+  parse_block_html: true
+
+exclude:
+  - docker-compose.yml
+  - Dockerfile
+  - .dockerignore
+
+plugins:
+  - jekyll-external-links
+  - jekyll-feed
+  - jekyll-redirect-from
+  - jekyll-sitemap
+  - jekyll-titles-from-headings
+  - jekyll-seo-tag
