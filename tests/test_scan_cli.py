@@ -16,6 +16,7 @@ EXPECTED = {
     "Alpha/beta.md": ("beta", "/Alpha/beta/"),
     "Docs/beta.md": ("beta", "/Docs/beta/"),
     "Docs/code.md": ("code", "/Docs/code/"),
+    "Docs/ref.md": ("ref", "/Docs/ref/"),
 }
 
 

@@ -1,6 +1,7 @@
 title: agent-wiki
 url: ""
 baseurl: ""
+blob_base: http://localhost:9000/wiki
 
 defaults:
   -

@@ -7,7 +7,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from index import build_index, resolve  # noqa: E402
-from links import compile_text  # noqa: E402
+from links import DEFAULT_BLOB_BASE, compile_text  # noqa: E402
 from scan import scan  # noqa: E402
 
 
@@ -39,19 +39,31 @@ def copy_jekyll_project(out):
         )
 
 
+def blob_base():
+    """BLOB_BASE env, else `blob_base` in _config.yml, else the local default."""
+    import os
+    import re
+
+    if os.environ.get("BLOB_BASE"):
+        return os.environ["BLOB_BASE"]
+    m = re.search(r"^blob_base:\s*(\S+)", (REPO / "_config.yml").read_text(), re.M)
+    return m.group(1).strip("\"'") if m else DEFAULT_BLOB_BASE
+
+
 def compile_wiki(root, out):
     """Write the compiled wiki to `out`; return (manifest, broken)."""
     root, out = Path(root), Path(out)
     manifest = write_manifest(root, out)
     index = build_index(manifest)
     broken = []
+    base = blob_base()
 
     def res(target, from_path):
         return resolve(target, from_path, index, manifest)
 
     for path in manifest["pages"]:
         text = (root / path).read_text(encoding="utf-8")
-        text, bad = compile_text(text, path, res)
+        text, bad = compile_text(text, path, res, base)
         broken += [(path, name) for name in bad]
         dest = out / path
         dest.parent.mkdir(parents=True, exist_ok=True)
