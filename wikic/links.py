@@ -9,8 +9,15 @@ def slugify(heading: str) -> str:
     return re.sub(r"[^\w-]", "", slug)
 
 
+# Fenced blocks (``` or ~~~) and inline code spans are copied through untouched.
+CODE = re.compile(
+    r"^ {0,3}(```+|~~~+)[^\n]*\n.*?(?:^ {0,3}\1[`~]*[ \t]*$|\Z)|(`+)(?!`)[^\n]+?(?<!`)\2(?!`)",
+    re.S | re.M,
+)
+
+
 def compile_text(text, from_path, resolve):
-    """Rewrite wikilinks in `text`; return (text, broken target names).
+    """Rewrite wikilinks in `text` outside code; return (text, broken target names).
 
     `resolve(target, from_path)` returns a page url or None.
     """
@@ -21,9 +28,16 @@ def compile_text(text, from_path, resolve):
         url = resolve(target, from_path)
         if url is None:
             broken.append(target)
-            return m.group(0)
+            label = alias.strip() if alias else target
+            return f'<span class="wikilink-broken">{label}</span>'
         if heading:
             url += "#" + slugify(heading)
         return f"[{alias.strip() if alias else target}]({url})"
 
-    return WIKILINK.sub(repl, text), broken
+    out, pos = [], 0
+    for code in CODE.finditer(text):
+        out.append(WIKILINK.sub(repl, text[pos:code.start()]))
+        out.append(code.group(0))
+        pos = code.end()
+    out.append(WIKILINK.sub(repl, text[pos:]))
+    return "".join(out), broken

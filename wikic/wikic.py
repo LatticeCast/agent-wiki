@@ -37,6 +37,10 @@ def compile_wiki(root, out):
         dest = out / path
         dest.parent.mkdir(parents=True, exist_ok=True)
         dest.write_text(text, encoding="utf-8")
+    report = {"broken": [{"page": p, "target": t} for p, t in sorted(broken)]}
+    (out / "report.json").write_text(
+        json.dumps(report, sort_keys=True, indent=2) + "\n", encoding="utf-8"
+    )
     return manifest, broken
 
 
@@ -52,6 +56,8 @@ def main(argv=None) -> int:
         manifest, broken = compile_wiki(args.root, args.out)
         for path, name in broken:
             print(f"broken link: {path}: [[{name}]]", file=sys.stderr)
+        print(f"{len(manifest['pages'])} pages, {len(broken)} broken links")
+        return 0
     else:
         manifest = write_manifest(args.root, args.out)
     print(f"{len(manifest['pages'])} pages -> {Path(args.out) / 'manifest.json'}")
