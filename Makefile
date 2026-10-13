@@ -14,3 +14,9 @@ stage2:
 test-site:
 	$(MAKE) site ROOT=tests/fixtures/wiki OUT=_stage1
 	python3 tests/check_site.py _site
+
+.PHONY: test-blob
+
+test-blob:
+	docker compose up -d --wait blob
+	BLOB_E2E=1 python3 -m unittest tests.test_blob_http -v; rc=$$?; docker compose stop blob; exit $$rc

@@ -48,6 +48,36 @@ def ensure_bucket(client, bucket):
         client.create_bucket(Bucket=bucket)
 
 
+def init(client, bucket):
+    """Create the bucket if missing; allow anonymous read and CORS GET for `*`."""
+    ensure_bucket(client, bucket)
+    policy = {
+        "Version": "2012-10-17",
+        "Statement": [
+            {
+                "Effect": "Allow",
+                "Principal": {"AWS": ["*"]},
+                "Action": ["s3:GetObject"],
+                "Resource": [f"arn:aws:s3:::{bucket}/*"],
+            }
+        ],
+    }
+    client.put_bucket_policy(Bucket=bucket, Policy=json.dumps(policy))
+    client.put_bucket_cors(
+        Bucket=bucket,
+        CORSConfiguration={
+            "CORSRules": [
+                {
+                    "AllowedOrigins": ["*"],
+                    "AllowedMethods": ["GET", "HEAD"],
+                    "AllowedHeaders": ["*"],
+                    "ExposeHeaders": ["ETag", "Content-Length", "Content-Type"],
+                }
+            ]
+        },
+    )
+
+
 def read_meta(client, bucket, doc):
     try:
         body = client.get_object(Bucket=bucket, Key=f"{doc}/meta.json")["Body"].read()

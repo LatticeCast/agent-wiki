@@ -81,7 +81,10 @@ def run_ref(args, client=None):
 
     client = client or refs.make_client()
     bucket = refs.bucket_name()
-    if args.ref_cmd == "add":
+    if args.ref_cmd == "init":
+        refs.init(client, bucket)
+        print(f"initialised bucket {bucket}")
+    elif args.ref_cmd == "add":
         rel = refs.add(client, bucket, args.file, args.doc, args.kind)
         print(f"{args.doc}/{rel}")
     else:
@@ -99,6 +102,7 @@ def main(argv=None) -> int:
         p.add_argument("--out", default="_stage1")
     ref = sub.add_parser("ref")
     rsub = ref.add_subparsers(dest="ref_cmd", required=True)
+    rsub.add_parser("init")
     radd = rsub.add_parser("add")
     radd.add_argument("file")
     radd.add_argument("--doc", required=True)
