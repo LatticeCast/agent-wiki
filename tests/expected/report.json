@@ -1,0 +1,12 @@
+{
+  "broken": [
+    {
+      "page": "Docs/code.md",
+      "target": "gone"
+    },
+    {
+      "page": "Docs/code.md",
+      "target": "nope"
+    }
+  ]
+}
