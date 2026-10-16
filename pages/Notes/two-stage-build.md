@@ -1,3 +1,7 @@
+---
+updated_at: 2026-10-13
+---
+
 Jekyll cannot resolve `[[name]]` links, because that needs to know every page first. So the build is split.
 
 ## Stage 1

@@ -1,3 +1,7 @@
+---
+updated_at: 2026-10-13
+---
+
 A page that mostly cites sources. The citations are written as `[[ref:...]]` once the files are in `blob/`; until then they are plain text.
 
 ## Sources

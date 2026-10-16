@@ -1,3 +1,7 @@
+---
+updated_at: 2026-10-13
+---
+
 External documents (PDFs, images, converted text) are not stored in Git. Put them in the `blob/` folder, one folder per document:
 
 ```

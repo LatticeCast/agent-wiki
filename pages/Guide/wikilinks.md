@@ -1,3 +1,7 @@
+---
+updated_at: 2026-10-13
+---
+
 Stage 1 turns Obsidian-style links into normal Markdown links before Jekyll runs.
 
 | You write | You get |

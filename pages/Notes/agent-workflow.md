@@ -1,3 +1,7 @@
+---
+updated_at: 2026-10-13
+---
+
 How an agent adds knowledge to this wiki:
 
 1. Read the source (a PDF, a web page, a repo). Save it under `blob/<doc>/` so it can be cited later. See [[blob]].
