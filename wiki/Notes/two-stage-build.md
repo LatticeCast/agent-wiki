@@ -6,7 +6,7 @@ Jekyll cannot resolve `[[name]]` links, because that needs to know every page fi
 
 ## Stage 1
 
-A Python tool in the `py` container reads `pages/`:
+A Python tool in the `py` container reads `wiki/` after lint passes.
 
 1. Hash every page together with its path, and write `manifest.json`.
 2. Rewrite `[[wikilinks]]` to Markdown links using that index. See [[wikilinks]].

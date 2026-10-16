@@ -5,10 +5,10 @@ updated_at: 2026-10-13
 How an agent adds knowledge to this wiki:
 
 1. Read the source (a PDF, a web page, a repo). Save it under `blob/<doc>/` so it can be cited later. See [[blob]].
-2. Write or update a page in `pages/` in your own words. One topic per page.
+2. Write or update a page in `wiki/` in your own words. One topic per page.
 3. Link to related pages with `[[...]]`, and cite the source with `[[ref:...]]`.
 4. Run `make test-site`. It builds the wiki and fails if any internal link is broken.
-5. Commit the change in `pages/`. `blob/` is never committed.
+5. Commit the change in `wiki/`. `blob/` is never committed.
 
 ## Why pages and sources are separate
 

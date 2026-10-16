@@ -22,7 +22,7 @@ CODE = re.compile(
 )
 
 
-def compile_text(text, from_path, resolve, blob_base=DEFAULT_BLOB_BASE):
+def compile_text(text, from_path, resolve, blob_base=DEFAULT_BLOB_BASE, on_broken=None):
     """Rewrite wikilinks in `text` outside code; return (text, broken target names).
 
     `resolve(target, from_path)` returns a page url or None.
@@ -41,6 +41,8 @@ def compile_text(text, from_path, resolve, blob_base=DEFAULT_BLOB_BASE):
             ok = parts[1] == "images"
         if not ok:
             broken.append(target)
+            if on_broken:
+                on_broken("reference", target)
             return f'<span class="wikilink-broken">{target}</span>'
         label = parts[-1]
         if bang:
@@ -55,6 +57,8 @@ def compile_text(text, from_path, resolve, blob_base=DEFAULT_BLOB_BASE):
         url = resolve(target, from_path)
         if url is None:
             broken.append(target)
+            if on_broken:
+                on_broken("link", target)
             label = alias.strip() if alias else target
             return f'<span class="wikilink-broken">{label}</span>'
         if heading:

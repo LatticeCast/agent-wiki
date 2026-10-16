@@ -4,7 +4,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 FIXTURE = ROOT / "tests" / "fixtures" / "wiki"
-sys.path.insert(0, str(ROOT / "wikic"))
+sys.path.insert(0, str(ROOT / "build"))
 from index import build_index, resolve  # noqa: E402
 from scan import scan  # noqa: E402
 

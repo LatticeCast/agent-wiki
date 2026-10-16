@@ -7,15 +7,16 @@ services:
   py:
     profiles: ["tools"]
     build:
-      context: ./wikic
+      context: ./build
     working_dir: /app
     environment:
       PYTHONDONTWRITEBYTECODE: "1"
-    command: sh -c "find _stage1 -mindepth 1 -delete; uv run --no-sync python wikic/wikic.py compile --root pages --out _stage1"
+    command: sh -c "uv run --no-sync python lint/lint.py --root wiki && find _stage1 -mindepth 1 -delete && uv run --no-sync python build/bulid.py compile --root wiki --out _stage1"
     volumes:
-      - ./wikic:/app/wikic:ro
+      - ./build:/app/build:ro
+      - ./lint:/app/lint:ro
       - ./tests:/app/tests:ro
-      - ./pages:/app/pages:ro
+      - ./wiki:/app/wiki:ro
       - ./assets:/app/assets:ro
       - ./_layouts:/app/_layouts:ro
       - ./_config.yml:/app/_config.yml:ro

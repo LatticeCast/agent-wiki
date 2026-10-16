@@ -8,7 +8,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 FIXTURE = ROOT / "tests" / "fixtures" / "wiki"
-CLI = ROOT / "wikic" / "wikic.py"
+CLI = ROOT / "build" / "bulid.py"
 
 EXPECTED = {
     "index.md": ("index", "/"),

@@ -6,7 +6,7 @@ import unittest
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parent.parent
-sys.path.insert(0, str(REPO / "wikic"))
+sys.path.insert(0, str(REPO / "build"))
 import refs  # noqa: E402
 
 
@@ -46,7 +46,7 @@ class RefsTest(unittest.TestCase):
 
     def test_cli_add_and_list(self):
         run = lambda *a: subprocess.run(
-            [sys.executable, str(REPO / "wikic/wikic.py"), "ref", *a],
+            [sys.executable, str(REPO / "build/bulid.py"), "ref", *a],
             capture_output=True, text=True, check=True,
         ).stdout.split()
         self.assertEqual(

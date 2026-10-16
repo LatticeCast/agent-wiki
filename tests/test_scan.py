@@ -8,7 +8,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 FIXTURE = ROOT / "tests" / "fixtures" / "wiki"
-sys.path.insert(0, str(ROOT / "wikic"))
+sys.path.insert(0, str(ROOT / "build"))
 from scan import scan  # noqa: E402
 
 EXPECTED = {
@@ -39,7 +39,7 @@ class ScanTest(unittest.TestCase):
         with tempfile.TemporaryDirectory() as o1, tempfile.TemporaryDirectory() as o2:
             for o in (o1, o2):
                 subprocess.run(
-                    [sys.executable, str(ROOT / "wikic/wikic.py"), "scan",
+                    [sys.executable, str(ROOT / "build/bulid.py"), "scan",
                      "--root", str(FIXTURE), "--out", o],
                     check=True, capture_output=True,
                 )
@@ -56,7 +56,7 @@ if __name__ == "__main__":
 class SpaceInNameTest(unittest.TestCase):
     def test_url_is_percent_encoded_and_title_is_file_name(self):
         import tempfile
-        import wikic as w
+        import bulid as w
 
         with tempfile.TemporaryDirectory() as d:
             (Path(d) / "Notes").mkdir()

@@ -7,7 +7,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 FIXTURE = ROOT / "tests" / "fixtures" / "wiki"
-sys.path.insert(0, str(ROOT / "wikic"))
+sys.path.insert(0, str(ROOT / "build"))
 from links import compile_text, slugify  # noqa: E402
 
 
@@ -46,7 +46,7 @@ class LinksTest(unittest.TestCase):
     def test_cli(self):
         with tempfile.TemporaryDirectory() as o:
             subprocess.run(
-                [sys.executable, str(ROOT / "wikic" / "wikic.py"), "compile",
+                [sys.executable, str(ROOT / "build" / "bulid.py"), "compile",
                  "--root", str(FIXTURE), "--out", o],
                 check=True, capture_output=True,
             )
@@ -59,7 +59,7 @@ class LinksTest(unittest.TestCase):
     def test_cli_code_and_report(self):
         with tempfile.TemporaryDirectory() as o:
             r = subprocess.run(
-                [sys.executable, str(ROOT / "wikic" / "wikic.py"), "compile",
+                [sys.executable, str(ROOT / "build" / "bulid.py"), "compile",
                  "--root", str(FIXTURE), "--out", o],
                 check=True, capture_output=True, text=True,
             )

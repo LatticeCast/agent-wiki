@@ -1,13 +1,17 @@
-ROOT ?= pages
+ROOT ?= wiki
+LINT_FLAGS ?=
 
-.PHONY: site stage1 stage2 serve test test-site clean
+.PHONY: build lint stage1 stage2 serve test test-site clean
 
-# Wiki pages are in pages/. _stage1/ and _site/ live in Docker volumes (never on
+# Wiki pages are in wiki/. _stage1/ and _site/ live in Docker volumes (never on
 # the host); ./blob (git-ignored) is mounted at _site/blob/ by the jekyll service.
-site: stage1 stage2
+build: stage1 stage2
+
+lint:
+	docker compose run --rm py uv run --no-sync python lint/lint.py --root $(ROOT) $(LINT_FLAGS)
 
 stage1:
-	docker compose run --rm py sh -c "find _stage1 -mindepth 1 -delete; uv run --no-sync python wikic/wikic.py compile --root $(ROOT) --out _stage1"
+	docker compose run --rm py sh -c "uv run --no-sync python lint/lint.py --root $(ROOT) $(LINT_FLAGS) && find _stage1 -mindepth 1 -delete && uv run --no-sync python build/bulid.py compile --root $(ROOT) --out _stage1"
 
 stage2:
 	mkdir -p blob
@@ -21,7 +25,7 @@ test:
 	python3 -m unittest discover -s tests
 
 test-site:
-	$(MAKE) site ROOT=tests/fixtures/wiki
+	$(MAKE) build ROOT=tests/fixtures/wiki LINT_FLAGS=--warn-only
 	docker compose run --rm py uv run --no-sync python tests/check_site.py _site
 
 clean:

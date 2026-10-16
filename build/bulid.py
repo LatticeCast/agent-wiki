@@ -6,7 +6,10 @@ import shutil
 import sys
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).resolve().parent))
+BUILD = Path(__file__).resolve().parent
+REPO = BUILD.parent
+sys.path.insert(0, str(BUILD))
+sys.path.insert(0, str(REPO))
 from index import build_index, resolve  # noqa: E402
 from links import DEFAULT_BLOB_BASE, compile_text  # noqa: E402
 from scan import scan  # noqa: E402
@@ -22,7 +25,6 @@ def write_manifest(root, out) -> dict:
     return manifest
 
 
-REPO = Path(__file__).resolve().parent.parent
 JEKYLL_FILES = ("_config.yml", "Gemfile", "Gemfile.lock")
 JEKYLL_DIRS = ("_layouts", "assets")
 
@@ -106,7 +108,7 @@ def main(argv=None) -> int:
     sub = ap.add_subparsers(dest="cmd", required=True)
     for name in ("scan", "compile"):
         p = sub.add_parser(name)
-        p.add_argument("--root", default="pages")
+        p.add_argument("--root", default="wiki")
         p.add_argument("--out", default="_stage1")
     ref = sub.add_parser("ref")
     rsub = ref.add_subparsers(dest="ref_cmd", required=True)

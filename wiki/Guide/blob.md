@@ -14,7 +14,7 @@ blob/rust-book/
 `make site` mounts `blob/` at `/blob/` on the site, so every file is at `/blob/<doc>/<kind>/<file>`. Add a file with:
 
 ```
-python3 wikic/wikic.py ref add ~/Downloads/book.pdf --doc rust-book
+python3 build/bulid.py ref add ~/Downloads/book.pdf --doc rust-book
 ```
 
 ## Citing a document
