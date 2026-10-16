@@ -1,3 +1,7 @@
+<<<<<<< HEAD
+*.patch
+=======
+>>>>>>> 89991c1180b718580bc3802ef4db750914efb260
 *.zip
 .agent-skills
 .claude
