@@ -36,7 +36,7 @@ A document is a folder in `pages/` (`pages/<doc>/index.md`, more `.md` next to i
    - Links inside code are left alone. An unresolved link becomes `<span class="wikilink-broken">name</span>` and is listed in `report.json`.
 3. **Blob references** (below) are compiled in the same pass.
 4. A page's url is its file path: `Alpha/beta.md` is `/Alpha/beta.html`, and `Alpha/index.md` is `/Alpha/`. Jekyll does this by default. Stage 1 adds front matter with `title:` set to the file name, because Jekyll renders only files with front matter.
-5. The Jekyll project files (`_config.yml`, `Gemfile`, `_layouts`, `assets`, `viewer`) are copied into `_stage1/`, which makes it a self-contained Jekyll source.
+5. The Jekyll project files (`_config.yml`, `Gemfile`, `_layouts`, `assets`) are copied into `_stage1/`, which makes it a self-contained Jekyll source.
 
 Excluded from the wiki pages: dot-folders, folders starting with `_`, `README.md`, `AGENTS.md`, `CLAUDE.md` and `llm*.md`.
 
@@ -49,10 +49,10 @@ Jekyll builds `_stage1/` into `_site/` with the `jekyll/jekyll` image. Gems are 
 | Write in a page | Compiled to |
 |-----------------|-------------|
 | `![[<doc>/images/<file>]]` | `![<file>](/blob/<doc>/images/<file>)` |
-| `[[ref:<doc>/<kind>/<file>]]` | `[<file>](/viewer/#<doc>/<kind>/<file>)` |
-| `[[ref:<doc>/pdf/<file>#p=N]]` | `[<file>](/viewer/#<doc>/pdf/<file>&p=N)` |
+| `[[ref:<doc>/<kind>/<file>]]` | `[<file>](/assets/viewer.html#<doc>/<kind>/<file>)` |
+| `[[ref:<doc>/pdf/<file>#p=N]]` | `[<file>](/assets/viewer.html#<doc>/pdf/<file>&p=N)` |
 
-`/viewer/` is a small JS page (`viewer/index.md`, `assets/viewer.js`). It reads the path from the URL hash and loads the file from `/blob/…`: images with `<img>`, PDF with PDF.js, `md` as text rendered in the browser, anything else as a download link. PDF.js and marked are vendored in `assets/vendor/`.
+`/assets/viewer.html` is a small JS page (with `assets/viewer.js`). It reads the path from the URL hash and loads the file from `/blob/…`: images with `<img>`, PDF with PDF.js, `md` as text rendered in the browser, anything else as a download link. PDF.js and marked are vendored in `assets/vendor/`.
 
 `wikic.py ref add <file> --doc <doc>` copies a file into `blob/<doc>/<kind>/` and updates `blob/<doc>/meta.json` (sha256 and size per file). `ref list --doc <doc>` lists them.
 

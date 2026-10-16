@@ -3,7 +3,7 @@ title: "ref"
 ---
 # Ref
 
-[book.pdf](/viewer/#rust-book/pdf/book.pdf&p=12) and [notes.md](/viewer/#rust-book/md/notes.md)
+[book.pdf](/assets/viewer.html#rust-book/pdf/book.pdf&p=12) and [notes.md](/assets/viewer.html#rust-book/md/notes.md)
 
 ![fig1.png](/blob/rust-book/images/fig1.png)
 

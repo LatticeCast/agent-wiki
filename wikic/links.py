@@ -45,7 +45,7 @@ def compile_text(text, from_path, resolve, blob_base=DEFAULT_BLOB_BASE):
         label = parts[-1]
         if bang:
             return f"![{label}]({blob_base}/{target})"
-        url = f"/viewer/#{target}"
+        url = f"/assets/viewer.html#{target}"
         if frag and frag.startswith("p=") and frag[2:].isdigit():
             url += f"&{frag}"
         return f"[{alias.strip() if alias else label}]({url})"

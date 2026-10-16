@@ -37,7 +37,7 @@ class CompileCliTest(unittest.TestCase):
                 k: v
                 for k, v in got.items()
                 if k not in ("_config.yml", "Gemfile", "Gemfile.lock")
-                and not k.startswith(("_layouts/", "assets/", "viewer/"))
+                and not k.startswith(("_layouts/", "assets/"))
             }
             self.assertEqual(set(got), set(want))
             for path in want:

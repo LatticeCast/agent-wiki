@@ -89,8 +89,8 @@ class RefsTest(unittest.TestCase):
         out, broken = self.c("[[ref:d/pdf/book.pdf]] [[ref:d/pdf/book.pdf#p=12]] [[ref:d/md/n.md|Notes]]")
         self.assertEqual(
             out,
-            "[book.pdf](/viewer/#d/pdf/book.pdf) [book.pdf](/viewer/#d/pdf/book.pdf&p=12) "
-            "[Notes](/viewer/#d/md/n.md)",
+            "[book.pdf](/assets/viewer.html#d/pdf/book.pdf) [book.pdf](/assets/viewer.html#d/pdf/book.pdf&p=12) "
+            "[Notes](/assets/viewer.html#d/md/n.md)",
         )
         self.assertEqual(broken, [])
 

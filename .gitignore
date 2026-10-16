@@ -1,3 +1,4 @@
+*.zip
 .agent-skills
 .claude
 .tmp/

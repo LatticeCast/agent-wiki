@@ -7,8 +7,7 @@ services:
   py:
     profiles: ["tools"]
     build:
-      context: .
-      dockerfile: wikic/Dockerfile
+      context: ./wikic
     working_dir: /app
     environment:
       PYTHONDONTWRITEBYTECODE: "1"
@@ -18,7 +17,6 @@ services:
       - ./tests:/app/tests:ro
       - ./pages:/app/pages:ro
       - ./assets:/app/assets:ro
-      - ./viewer:/app/viewer:ro
       - ./_layouts:/app/_layouts:ro
       - ./_config.yml:/app/_config.yml:ro
       - ./Gemfile:/app/Gemfile:ro
